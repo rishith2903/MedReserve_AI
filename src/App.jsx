@@ -42,7 +42,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <CustomThemeProvider>
         <AuthProvider>
-          <Router>
+          <Router basename="/MedReserve-AI">
             <Routes>
               {/* Public routes */}
               <Route path="/login" element={<Login />} />
