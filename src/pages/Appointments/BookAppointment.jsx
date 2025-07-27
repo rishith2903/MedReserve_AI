@@ -196,7 +196,14 @@ const BookAppointment = () => {
                     onChange={setSelectedDate}
                     minDate={new Date()}
                     maxDate={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)} // 30 days from now
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    slots={{
+                      textField: TextField
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true
+                      }
+                    }}
                   />
                 </LocalizationProvider>
               </Grid>

@@ -353,7 +353,15 @@ const MyAppointments = () => {
               value={newDateTime}
               onChange={setNewDateTime}
               minDateTime={new Date()}
-              renderInput={(params) => <TextField {...params} fullWidth sx={{ mt: 2 }} />}
+              slots={{
+                textField: TextField
+              }}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  sx: { mt: 2 }
+                }
+              }}
             />
           </LocalizationProvider>
         </DialogContent>
