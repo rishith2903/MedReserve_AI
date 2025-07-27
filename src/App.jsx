@@ -26,6 +26,7 @@ import Chatbot from './pages/AI/Chatbot';
 import Profile from './pages/Profile/Profile';
 import HealthTips from './pages/Health/HealthTips';
 import EmergencyContacts from './pages/Emergency/EmergencyContacts';
+import ChatbotLanguageSelector from './components/ChatbotLanguageSelector';
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -80,6 +81,9 @@ function App() {
               {/* Catch all route */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+
+            {/* Multilingual Chatbot Language Selector */}
+            <ChatbotLanguageSelector />
           </Router>
         </AuthProvider>
       </CustomThemeProvider>

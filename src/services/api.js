@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 // Create axios instance
 const api = axios.create({
@@ -186,6 +186,56 @@ export const aiAPI = {
 
   chatbot: async (message) => {
     const response = await api.post('/ai/chatbot', { message });
+    return response.data;
+  }
+};
+
+// Disease Prediction API
+export const diseasePredictionAPI = {
+  predict: async (symptoms, method = 'ensemble', additionalData = {}) => {
+    const response = await api.post('/disease-prediction/predict', {
+      symptoms,
+      method,
+      ...additionalData
+    });
+    return response.data;
+  },
+
+  predictML: async (symptoms, additionalData = {}) => {
+    const response = await api.post('/disease-prediction/predict/ml', {
+      symptoms,
+      ...additionalData
+    });
+    return response.data;
+  },
+
+  predictDL: async (symptoms, additionalData = {}) => {
+    const response = await api.post('/disease-prediction/predict/dl', {
+      symptoms,
+      ...additionalData
+    });
+    return response.data;
+  },
+
+  compare: async (symptoms, additionalData = {}) => {
+    const response = await api.post('/disease-prediction/compare', {
+      symptoms,
+      ...additionalData
+    });
+    return response.data;
+  },
+
+  analyze: async (symptoms, analysisType = 'ml', topFeatures = 10) => {
+    const response = await api.post('/disease-prediction/analyze', {
+      symptoms,
+      analysisType,
+      topFeatures
+    });
+    return response.data;
+  },
+
+  healthCheck: async () => {
+    const response = await api.get('/disease-prediction/health');
     return response.data;
   }
 };
