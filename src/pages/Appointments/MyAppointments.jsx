@@ -27,7 +27,7 @@ import {
   Phone,
   Email,
   Cancel,
-  Reschedule,
+  Update,
   CheckCircle,
   Schedule,
 } from '@mui/icons-material';
@@ -295,7 +295,7 @@ const MyAppointments = () => {
                     <Button
                       variant="outlined"
                       size="small"
-                      startIcon={<Reschedule />}
+                      startIcon={<Update />}
                       onClick={() => {
                         setSelectedAppointment(appointment);
                         setRescheduleDialog(true);
