@@ -129,6 +129,18 @@ export const appointmentsAPI = {
   reschedule: async (id, newDateTime) => {
     const response = await api.put(`/appointments/${id}/reschedule`, { newDateTime });
     return response.data;
+  },
+
+  book: async (appointmentData) => {
+    const response = await api.post('/appointments/book', appointmentData);
+    return response.data;
+  },
+
+  getAvailableSlots: async (doctorId, date) => {
+    const response = await api.get(`/appointments/doctor/${doctorId}/available-slots`, {
+      params: { date }
+    });
+    return response.data;
   }
 };
 
@@ -177,42 +189,7 @@ export const prescriptionsAPI = {
   }
 };
 
-// Appointments API
-export const appointmentsAPI = {
-  getAll: async (params = {}) => {
-    const response = await api.get('/appointments', { params });
-    return response.data;
-  },
 
-  getById: async (id) => {
-    const response = await api.get(`/appointments/${id}`);
-    return response.data;
-  },
-
-  book: async (appointmentData) => {
-    const response = await api.post('/appointments/book', appointmentData);
-    return response.data;
-  },
-
-  reschedule: async (appointmentId, newDateTime) => {
-    const response = await api.put(`/appointments/${appointmentId}/reschedule`, null, {
-      params: { newDateTime }
-    });
-    return response.data;
-  },
-
-  cancel: async (appointmentId) => {
-    const response = await api.put(`/appointments/${appointmentId}/cancel`);
-    return response.data;
-  },
-
-  getAvailableSlots: async (doctorId, date) => {
-    const response = await api.get(`/appointments/doctor/${doctorId}/available-slots`, {
-      params: { date }
-    });
-    return response.data;
-  }
-};
 
 // AI Services API
 export const aiAPI = {
