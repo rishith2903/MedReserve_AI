@@ -2,7 +2,7 @@
   "name": "medreserve-frontend",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://rishith2903.github.io/MedReserve-AI",
+  
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
