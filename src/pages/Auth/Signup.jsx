@@ -72,8 +72,15 @@ const Signup = () => {
       setIsLoading(true);
       setError(null);
       const { confirmPassword, ...signupData } = data;
-      await signup(signupData);
-      navigate('/dashboard');
+      const response = await signup(signupData);
+
+      // Signup successful, redirect to login
+      navigate('/login', {
+        state: {
+          message: response.message || 'Account created successfully! Please log in.',
+          email: signupData.email
+        }
+      });
     } catch (err) {
       setError(err.response?.data?.message || 'Signup failed. Please try again.');
     } finally {

@@ -37,16 +37,25 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const from = location.state?.from?.pathname || '/dashboard';
 
+  // Check for success message from signup
+  React.useEffect(() => {
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message);
+    }
+  }, [location.state]);
+
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -55,6 +64,13 @@ const Login = () => {
       password: '',
     },
   });
+
+  // Pre-fill email if coming from signup
+  React.useEffect(() => {
+    if (location.state?.email) {
+      setValue('email', location.state.email);
+    }
+  }, [location.state, setValue]);
 
   const onSubmit = async (data) => {
     try {
@@ -125,6 +141,12 @@ const Login = () => {
             <Typography variant="h4" component="h2" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
               Sign In
             </Typography>
+
+            {successMessage && (
+              <Alert severity="success" sx={{ mb: 3 }}>
+                {successMessage}
+              </Alert>
+            )}
 
             {error && (
               <Alert severity="error" sx={{ mb: 3 }}>

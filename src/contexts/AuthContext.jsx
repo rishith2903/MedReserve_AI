@@ -62,12 +62,23 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoading(true);
       const response = await authAPI.login(credentials);
-      
-      if (response.token && response.user) {
-        setToken(response.token);
-        setUser(response.user);
-        localStorage.setItem('authToken', response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
+
+      // Backend returns: { accessToken, refreshToken, id, email, firstName, lastName, role }
+      if (response.accessToken) {
+        const token = response.accessToken;
+        const user = {
+          id: response.id,
+          email: response.email,
+          firstName: response.firstName,
+          lastName: response.lastName,
+          role: response.role
+        };
+
+        setToken(token);
+        setUser(user);
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('refreshToken', response.refreshToken);
       } else {
         throw new Error('Invalid response format');
       }
@@ -83,12 +94,12 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoading(true);
       const response = await authAPI.signup(userData);
-      
-      if (response.token && response.user) {
-        setToken(response.token);
-        setUser(response.user);
-        localStorage.setItem('authToken', response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
+
+      // For signup, backend returns success message, not tokens
+      // User needs to login after successful signup
+      if (response.success || response.message) {
+        // Signup successful, but don't auto-login
+        return response;
       } else {
         throw new Error('Invalid response format');
       }
