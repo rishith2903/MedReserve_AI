@@ -5,7 +5,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 30000, // Increased timeout for better UX
   headers: {
     'Content-Type': 'application/json',
   },
@@ -31,11 +31,18 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response?.status === 401) {
+    // Handle different types of errors
+    if (error.code === 'ECONNABORTED') {
+      console.error('Request timeout - backend may be sleeping or unreachable');
+      error.message = 'Connection timeout. The server may be starting up, please try again in a moment.';
+    } else if (error.response?.status === 401) {
       // Unauthorized - clear token and redirect to login
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
       window.location.href = '/login';
+    } else if (error.response?.status === 0 || error.message.includes('CORS')) {
+      console.error('CORS error - frontend domain not allowed by backend');
+      error.message = 'Connection error. Please check your network connection.';
     }
     return Promise.reject(error);
   }
