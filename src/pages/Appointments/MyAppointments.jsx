@@ -353,6 +353,7 @@ const MyAppointments = () => {
               value={newDateTime}
               onChange={setNewDateTime}
               minDateTime={new Date()}
+              enableAccessibleFieldDOMStructure={false}
               slots={{
                 textField: TextField
               }}

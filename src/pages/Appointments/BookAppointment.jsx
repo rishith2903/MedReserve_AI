@@ -196,6 +196,7 @@ const BookAppointment = () => {
                     onChange={setSelectedDate}
                     minDate={new Date()}
                     maxDate={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)} // 30 days from now
+                    enableAccessibleFieldDOMStructure={false}
                     slots={{
                       textField: TextField
                     }}

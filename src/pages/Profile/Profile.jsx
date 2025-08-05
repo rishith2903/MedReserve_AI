@@ -263,11 +263,6 @@ const Profile = () => {
                 InputProps={{
                   startAdornment: <CalendarToday sx={{ mr: 1, color: 'text.secondary' }} />
                 }}
-                slotProps={{
-                  textField: {
-                    enableAccessibleFieldDOMStructure: false
-                  }
-                }}
               />
             </Grid>
 

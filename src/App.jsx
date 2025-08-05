@@ -15,7 +15,7 @@ import MyPatients from './pages/Doctor/MyPatients';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import Login from './pages/Auth/Login';
 import Signup from './pages/Auth/Signup';
-import Dashboard from './pages/Dashboard/Dashboard';
+import Dashboard from './pages/Dashboard/DashboardMain';
 import DoctorList from './pages/Doctors/DoctorList';
 import DoctorDetail from './pages/Doctors/DoctorDetail';
 import BookAppointment from './pages/Appointments/BookAppointment';
