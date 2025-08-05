@@ -295,8 +295,14 @@ const Chatbot = () => {
                     '& .MuiListItemText-primary': {
                       bgcolor: message.sender === 'user'
                         ? theme.palette.primary.main
-                        : theme.palette.grey[100],
-                      color: message.sender === 'user' ? 'white' : 'text.primary',
+                        : theme.palette.mode === 'dark'
+                          ? theme.palette.grey[800]
+                          : theme.palette.grey[100],
+                      color: message.sender === 'user'
+                        ? 'white'
+                        : theme.palette.mode === 'dark'
+                          ? theme.palette.common.white
+                          : theme.palette.text.primary,
                       p: 2,
                       borderRadius: 2,
                       display: 'inline-block',
