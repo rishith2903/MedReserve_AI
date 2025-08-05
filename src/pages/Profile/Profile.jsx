@@ -30,7 +30,7 @@ import {
   CalendarToday
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
-import { apiService } from '../../services/api';
+import api from '../../services/api';
 
 const Profile = () => {
   const { user, updateUser } = useAuth();
@@ -76,7 +76,7 @@ const Profile = () => {
     setSuccess('');
 
     try {
-      const response = await apiService.put('/auth/profile', formData);
+      const response = await api.put('/auth/profile', formData);
       updateUser(response.data);
       setSuccess('Profile updated successfully!');
       setIsEditing(false);
