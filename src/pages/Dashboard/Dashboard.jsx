@@ -1,129 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Avatar,
-  Chip,
-  LinearProgress,
-  Paper,
-  IconButton,
-  Divider,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Badge,
-  Skeleton,
-  useTheme,
-  alpha,
-} from '@mui/material';
-import {
-  Dashboard as DashboardIcon,
-  People,
-  CalendarToday,
-  LocalHospital,
-  TrendingUp,
-  Notifications,
-  HealthAndSafety,
-  Psychology,
-  Assignment,
-  Medication,
-  Timeline,
-  Favorite,
-  Schedule,
-  Assessment,
-  CloudUpload,
-  Chat,
-  ArrowForward,
-  CheckCircle,
-  Warning,
-  Info,
-  Error,
-  WaterDrop,
-  DirectionsWalk,
-  Bedtime,
-  MonitorHeart,
-  Thermostat,
-  BloodtypeOutlined,
-} from '@mui/icons-material';
+import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import PatientDashboard from './PatientDashboard';
+import DoctorDashboard from './DoctorDashboard';
+import AdminDashboard from './AdminDashboard';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const theme = useTheme();
-  const [loading, setLoading] = useState(true);
-  const [healthData, setHealthData] = useState({});
 
-  useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      setLoading(false);
-      setHealthData({
-        heartRate: 72,
-        bloodPressure: '120/80',
-        temperature: 98.6,
-        oxygenLevel: 98,
-      });
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  // Get user role
+  const userRole = user?.role?.name || user?.role;
 
-  const quickActions = [
-    {
-      title: 'Book Appointment',
-      description: 'Schedule with specialists',
-      icon: <CalendarToday />,
-      color: 'primary',
-      path: '/doctors',
-      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-    },
-    {
-      title: 'AI Symptom Checker',
-      description: 'Get instant health insights',
-      icon: <Psychology />,
-      color: 'secondary',
-      path: '/symptom-checker',
-      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
-    },
-    {
-      title: 'Medical Reports',
-      description: 'View your health records',
-      icon: <Assignment />,
-      color: 'success',
-      path: '/medical-reports',
-      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
-    },
-    {
-      title: 'AI Health Assistant',
-      description: 'Chat with our AI doctor',
-      icon: <Chat />,
-      color: 'info',
-      path: '/chatbot',
-      gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
-    },
-    {
-      title: 'Upload Reports',
-      description: 'Share your test results',
-      icon: <CloudUpload />,
-      color: 'warning',
-      path: '/upload-reports',
-      gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
-    },
-    {
-      title: 'Medicines',
-      description: 'Track your medications',
-      icon: <Medication />,
-      color: 'error',
-      path: '/medicines',
-      gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'
-    }
-  ];
+  // Render appropriate dashboard based on user role
+  switch (userRole) {
+    case 'PATIENT':
+      return <PatientDashboard />;
+    case 'DOCTOR':
+      return <DoctorDashboard />;
+    case 'ADMIN':
+    case 'MASTER_ADMIN':
+      return <AdminDashboard />;
+    default:
+      // Fallback to patient dashboard for unknown roles
+      return <PatientDashboard />;
+  }
+};
+
+export default Dashboard;
 
   const healthMetrics = [
     {

@@ -1,0 +1,300 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Avatar,
+  Chip,
+  Button,
+  Paper,
+  LinearProgress,
+  Skeleton,
+  alpha,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+} from '@mui/material';
+import {
+  People,
+  Schedule,
+  TrendingUp,
+  Star,
+  AccessTime,
+  Person,
+  CalendarToday,
+  Psychology,
+  Chat,
+  Description,
+} from '@mui/icons-material';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
+const DoctorDashboard = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading
+    const timer = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const doctorMetrics = [
+    {
+      title: 'Today\'s Patients',
+      value: '12',
+      icon: <People />,
+      color: '#2196f3',
+      change: '3 more than yesterday',
+      changeType: 'positive'
+    },
+    {
+      title: 'This Week\'s Appointments',
+      value: '48',
+      icon: <Schedule />,
+      color: '#4caf50',
+      change: '+15% from last week',
+      changeType: 'positive'
+    },
+    {
+      title: 'Patient Rating',
+      value: '4.8',
+      icon: <Star />,
+      color: '#ff9800',
+      change: 'Based on 127 reviews',
+      changeType: 'info'
+    },
+    {
+      title: 'Consultation Hours',
+      value: '32h',
+      icon: <AccessTime />,
+      color: '#9c27b0',
+      change: 'This week',
+      changeType: 'info'
+    }
+  ];
+
+  const todaysAppointments = [
+    { time: '09:00 AM', patient: 'John Smith', type: 'Consultation', status: 'confirmed' },
+    { time: '10:30 AM', patient: 'Sarah Johnson', type: 'Follow-up', status: 'confirmed' },
+    { time: '02:00 PM', patient: 'Mike Wilson', type: 'Check-up', status: 'pending' },
+    { time: '03:30 PM', patient: 'Emma Davis', type: 'Consultation', status: 'confirmed' },
+  ];
+
+  const quickActions = [
+    {
+      title: 'View Patients',
+      description: 'Manage your patient list',
+      icon: <People />,
+      color: '#2196f3',
+      action: () => navigate('/patients')
+    },
+    {
+      title: 'Schedule',
+      description: 'View your appointments',
+      icon: <CalendarToday />,
+      color: '#4caf50',
+      action: () => navigate('/appointments')
+    },
+    {
+      title: 'AI Tools',
+      description: 'Use diagnostic tools',
+      icon: <Psychology />,
+      color: '#9c27b0',
+      action: () => navigate('/symptom-checker')
+    },
+    {
+      title: 'Patient Chat',
+      description: 'Communicate with patients',
+      icon: <Chat />,
+      color: '#ff9800',
+      action: () => navigate('/chatbot')
+    }
+  ];
+
+  return (
+    <Box sx={{ flexGrow: 1, p: 3, backgroundColor: 'background.default', minHeight: '100vh' }}>
+      {/* Welcome Section */}
+      <Box sx={{
+        mb: 4,
+        p: 3,
+        background: 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)',
+        borderRadius: 3,
+        color: 'white',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        <Box sx={{ position: 'relative', zIndex: 1 }}>
+          <Typography variant="h3" gutterBottom sx={{ fontWeight: 700, mb: 1 }}>
+            Good morning, Dr. {user?.lastName || 'Doctor'}! 👨‍⚕️
+          </Typography>
+          <Typography variant="h6" sx={{ opacity: 0.9, fontWeight: 400 }}>
+            Ready to help your patients today
+          </Typography>
+          <Typography variant="body1" sx={{ opacity: 0.8, mt: 1 }}>
+            {new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Doctor Metrics Cards */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        {doctorMetrics.map((metric, index) => (
+          <Grid item xs={12} sm={6} md={3} key={index}>
+            <Card sx={{
+              height: '100%',
+              background: `linear-gradient(135deg, ${metric.color}15 0%, ${metric.color}25 100%)`,
+              border: `1px solid ${metric.color}30`,
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: `0 8px 25px ${metric.color}40`,
+              }
+            }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Avatar sx={{
+                    bgcolor: metric.color,
+                    mr: 2,
+                    width: 48,
+                    height: 48
+                  }}>
+                    {metric.icon}
+                  </Avatar>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h4" sx={{ fontWeight: 700, color: metric.color }}>
+                      {loading ? <Skeleton width={60} /> : metric.value}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                      {metric.title}
+                    </Typography>
+                  </Box>
+                </Box>
+                <Chip
+                  label={metric.change}
+                  size="small"
+                  sx={{
+                    bgcolor: metric.changeType === 'positive' ? '#4caf5020' :
+                             metric.changeType === 'warning' ? '#ff980020' : '#2196f320',
+                    color: metric.changeType === 'positive' ? '#4caf50' :
+                           metric.changeType === 'warning' ? '#ff9800' : '#2196f3',
+                    fontWeight: 600,
+                    border: 'none'
+                  }}
+                />
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      {/* Today's Schedule and Quick Actions */}
+      <Grid container spacing={3}>
+        {/* Today's Appointments */}
+        <Grid item xs={12} md={8}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+                Today's Appointments
+              </Typography>
+              <List>
+                {todaysAppointments.map((appointment, index) => (
+                  <ListItem key={index} sx={{ 
+                    border: '1px solid #e0e0e0', 
+                    borderRadius: 2, 
+                    mb: 1,
+                    '&:hover': { bgcolor: 'action.hover' }
+                  }}>
+                    <ListItemAvatar>
+                      <Avatar sx={{ bgcolor: '#2196f3' }}>
+                        <Person />
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                            {appointment.patient}
+                          </Typography>
+                          <Chip
+                            label={appointment.status}
+                            size="small"
+                            color={appointment.status === 'confirmed' ? 'success' : 'warning'}
+                          />
+                        </Box>
+                      }
+                      secondary={
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            {appointment.time} • {appointment.type}
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Quick Actions */}
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+                Quick Actions
+              </Typography>
+              <Grid container spacing={2}>
+                {quickActions.map((action, index) => (
+                  <Grid item xs={12} key={index}>
+                    <Paper
+                      sx={{
+                        p: 2,
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        border: `1px solid ${action.color}20`,
+                        '&:hover': {
+                          transform: 'translateY(-2px)',
+                          boxShadow: `0 4px 15px ${action.color}30`,
+                          bgcolor: `${action.color}05`
+                        }
+                      }}
+                      onClick={action.action}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Avatar sx={{ bgcolor: action.color, mr: 2, width: 40, height: 40 }}>
+                          {action.icon}
+                        </Avatar>
+                        <Box>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                            {action.title}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {action.description}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Paper>
+                  </Grid>
+                ))}
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+};
+
+export default DoctorDashboard;

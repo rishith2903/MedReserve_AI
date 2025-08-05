@@ -78,35 +78,62 @@ const TopNavLayout = () => {
     handleProfileMenuClose();
   };
 
-  const navigationItems = [
-    { label: 'Dashboard', path: '/dashboard', icon: <Dashboard /> },
-    { label: 'Doctors', path: '/doctors', icon: <People /> },
-    { label: 'Appointments', path: '/appointments', icon: <CalendarToday /> },
-    { label: 'Medical Reports', path: '/medical-reports', icon: <Description /> },
-    { label: 'Medicines', path: '/medicines', icon: <Medication /> },
-    { label: 'Upload Reports', path: '/upload-reports', icon: <CloudUpload /> },
-    { label: 'AI Symptom Checker', path: '/symptom-checker', icon: <Psychology /> },
-    { label: 'AI Chatbot', path: '/chatbot', icon: <Chat /> },
-    { label: 'Health Tips', path: '/health-tips', icon: <HealthAndSafety /> },
-    { label: 'Emergency', path: '/emergency', icon: <LocalHospital /> },
-  ];
+  // Role-based navigation items
+  const getNavigationItems = () => {
+    const userRole = user?.role?.name || user?.role;
 
-  // Add admin items if user is admin
-  if (user?.role?.name === 'ADMIN') {
-    navigationItems.push(
-      { label: 'All Users', path: '/admin/users', icon: <People /> },
-      { label: 'All Doctors', path: '/admin/doctors', icon: <People /> },
-      { label: 'System Health', path: '/admin/system-health', icon: <MonitorHeart /> },
-      { label: 'Credentials', path: '/admin/credentials', icon: <Security /> }
-    );
-  }
+    // Common items for all authenticated users
+    const commonItems = [
+      { label: 'Dashboard', path: '/dashboard', icon: <Dashboard /> },
+    ];
 
-  // Add doctor items if user is doctor
-  if (user?.role?.name === 'DOCTOR') {
-    navigationItems.push(
-      { label: 'My Patients', path: '/patients', icon: <People /> }
-    );
-  }
+    // Patient-specific navigation
+    if (userRole === 'PATIENT') {
+      return [
+        ...commonItems,
+        { label: 'Find Doctors', path: '/doctors', icon: <People /> },
+        { label: 'My Appointments', path: '/appointments', icon: <CalendarToday /> },
+        { label: 'Medical Reports', path: '/medical-reports', icon: <Description /> },
+        { label: 'My Medicines', path: '/medicines', icon: <Medication /> },
+        { label: 'Upload Reports', path: '/upload-reports', icon: <CloudUpload /> },
+        { label: 'AI Symptom Checker', path: '/symptom-checker', icon: <Psychology /> },
+        { label: 'AI Chatbot', path: '/chatbot', icon: <Chat /> },
+        { label: 'Health Tips', path: '/health-tips', icon: <HealthAndSafety /> },
+        { label: 'Emergency', path: '/emergency', icon: <LocalHospital /> },
+      ];
+    }
+
+    // Doctor-specific navigation
+    if (userRole === 'DOCTOR') {
+      return [
+        ...commonItems,
+        { label: 'My Patients', path: '/patients', icon: <People /> },
+        { label: 'My Schedule', path: '/appointments', icon: <CalendarToday /> },
+        { label: 'Patient Reports', path: '/medical-reports', icon: <Description /> },
+        { label: 'AI Tools', path: '/symptom-checker', icon: <Psychology /> },
+        { label: 'Chat with Patients', path: '/chatbot', icon: <Chat /> },
+        { label: 'My Profile', path: '/profile', icon: <Person /> },
+      ];
+    }
+
+    // Admin-specific navigation
+    if (userRole === 'ADMIN' || userRole === 'MASTER_ADMIN') {
+      return [
+        ...commonItems,
+        { label: 'All Users', path: '/admin/users', icon: <People /> },
+        { label: 'All Doctors', path: '/admin/doctors', icon: <People /> },
+        { label: 'System Health', path: '/admin/system-health', icon: <MonitorHeart /> },
+        { label: 'Appointments', path: '/admin/appointments', icon: <CalendarToday /> },
+        { label: 'Credentials', path: '/admin/credentials', icon: <Security /> },
+        { label: 'Reports', path: '/medical-reports', icon: <Description /> },
+      ];
+    }
+
+    // Default fallback
+    return commonItems;
+  };
+
+  const navigationItems = getNavigationItems();
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
