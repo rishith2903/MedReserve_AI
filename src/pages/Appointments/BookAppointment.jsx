@@ -78,7 +78,7 @@ const BookAppointment = () => {
     rating: 4.8,
     reviews: 156,
     image: null,
-    consultationFee: 150,
+    consultationFee: 500,
   };
 
   const appointmentTypes = [
@@ -156,23 +156,38 @@ const BookAppointment = () => {
     setError(null);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Validate required fields
+      if (!selectedDate || !selectedTime || !appointmentType || !chiefComplaint) {
+        setError('Please fill in all required fields.');
+        return;
+      }
 
-      // In real implementation, call the API:
-      // const appointmentData = {
-      //   doctorId: parseInt(doctorId),
-      //   appointmentDateTime: `${selectedDate.toISOString().split('T')[0]} ${selectedTime}`,
-      //   appointmentType,
-      //   chiefComplaint,
-      //   symptoms,
-      //   durationMinutes: 30
-      // };
-      // await appointmentsAPI.book(appointmentData);
+      // Prepare appointment data
+      const appointmentDateTime = new Date(selectedDate);
+      const [hours, minutes] = selectedTime.split(':');
+      appointmentDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+      const appointmentData = {
+        doctorId: parseInt(doctorId),
+        appointmentDateTime: appointmentDateTime.toISOString(),
+        appointmentType,
+        chiefComplaint,
+        symptoms: symptoms || '',
+        durationMinutes: 30
+      };
+
+      // Call the API to book appointment
+      await appointmentsAPI.book(appointmentData);
 
       setSuccess(true);
+
+      // Navigate to appointments page after successful booking
+      setTimeout(() => {
+        navigate('/appointments');
+      }, 2000);
     } catch (err) {
-      setError('Failed to book appointment. Please try again.');
+      console.error('Booking error:', err);
+      setError(err.response?.data?.message || 'Failed to book appointment. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -432,7 +447,7 @@ const BookAppointment = () => {
                 <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
                   <Chip label={`${doctor.experience} years exp.`} size="small" />
                   <Chip label={`${doctor.rating}★ (${doctor.reviews} reviews)`} size="small" />
-                  <Chip label={`$${doctor.consultationFee} consultation`} size="small" color="primary" />
+                  <Chip label={`₹${doctor.consultationFee} consultation`} size="small" color="primary" />
                 </Box>
               </Box>
             </Box>

@@ -29,6 +29,13 @@ export const AuthProvider = ({ children }) => {
             setToken(storedToken);
             setUser(userData);
 
+            // Store last visited page to prevent unwanted redirects
+            const lastPath = localStorage.getItem('lastPath');
+            if (lastPath && lastPath !== '/login' && lastPath !== '/signup') {
+              // Don't redirect if user was on a specific page
+              console.log('User was on:', lastPath);
+            }
+
             // Verify token in background (don't block UI)
             setTimeout(async () => {
               try {

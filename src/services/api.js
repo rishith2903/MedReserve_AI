@@ -109,7 +109,7 @@ export const doctorsAPI = {
 // Appointments API
 export const appointmentsAPI = {
   getAll: async (params = {}) => {
-    const response = await api.get('/appointments', { params });
+    const response = await api.get('/appointments/patient/my-appointments', { params });
     return response.data;
   },
 

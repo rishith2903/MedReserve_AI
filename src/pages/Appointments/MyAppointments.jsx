@@ -99,18 +99,35 @@ const MyAppointments = () => {
   const fetchAppointments = async () => {
     setLoading(true);
     try {
-      // In real implementation, call the API:
-      // const response = await appointmentsAPI.getAll();
-      // setAppointments(response.data || response);
+      // Call the API to get user's appointments
+      const response = await appointmentsAPI.getAll();
+      const appointmentsData = response.content || response.data || response;
 
-      // For now, use mock data
-      setTimeout(() => {
-        setAppointments(mockAppointments);
-        setLoading(false);
-      }, 1000);
+      // Transform backend data to match frontend format if needed
+      const transformedAppointments = Array.isArray(appointmentsData)
+        ? appointmentsData.map(apt => ({
+            id: apt.id,
+            doctorName: apt.doctorName || `Dr. ${apt.doctor?.firstName} ${apt.doctor?.lastName}`,
+            specialty: apt.doctor?.specialty || apt.specialty,
+            date: new Date(apt.appointmentDateTime).toDateString(),
+            time: new Date(apt.appointmentDateTime).toLocaleTimeString(),
+            status: apt.status,
+            type: apt.appointmentType || apt.type,
+            location: apt.location || 'MedReserve Clinic',
+            phone: apt.doctor?.phone || '+1 (555) 123-4567',
+            email: apt.doctor?.email || 'doctor@medreserve.com',
+            notes: apt.chiefComplaint || apt.notes
+          }))
+        : [];
+
+      setAppointments(transformedAppointments);
     } catch (err) {
-      setError('Failed to fetch appointments');
-      setAppointments(mockAppointments); // Fallback to mock data
+      console.error('Error fetching appointments:', err);
+      setError('Failed to load appointments. Using sample data.');
+
+      // Fallback to mock data if API fails
+      setAppointments(mockAppointments);
+    } finally {
       setLoading(false);
     }
   };
@@ -149,8 +166,8 @@ const MyAppointments = () => {
     if (!newDateTime || !selectedAppointment) return;
 
     try {
-      // In real implementation:
-      // await appointmentsAPI.reschedule(selectedAppointment.id, newDateTime.toISOString());
+      // Call the API to reschedule appointment
+      await appointmentsAPI.reschedule(selectedAppointment.id, newDateTime.toISOString());
 
       // Update local state
       setAppointments(prev => prev.map(apt =>
@@ -162,8 +179,10 @@ const MyAppointments = () => {
       setRescheduleDialog(false);
       setSelectedAppointment(null);
       setNewDateTime(null);
+      setError(''); // Clear any previous errors
     } catch (err) {
-      setError('Failed to reschedule appointment');
+      console.error('Reschedule error:', err);
+      setError(err.response?.data?.message || 'Failed to reschedule appointment');
     }
   };
 
@@ -171,8 +190,8 @@ const MyAppointments = () => {
     if (!selectedAppointment) return;
 
     try {
-      // In real implementation:
-      // await appointmentsAPI.cancel(selectedAppointment.id);
+      // Call the API to cancel appointment
+      await appointmentsAPI.cancel(selectedAppointment.id);
 
       // Update local state
       setAppointments(prev => prev.map(apt =>
@@ -183,8 +202,10 @@ const MyAppointments = () => {
 
       setCancelDialog(false);
       setSelectedAppointment(null);
+      setError(''); // Clear any previous errors
     } catch (err) {
-      setError('Failed to cancel appointment');
+      console.error('Cancel error:', err);
+      setError(err.response?.data?.message || 'Failed to cancel appointment');
     }
   };
 
