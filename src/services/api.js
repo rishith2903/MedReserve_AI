@@ -17,6 +17,9 @@ api.interceptors.request.use(
     const token = localStorage.getItem('authToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log(`🔐 API Request to ${config.url} with token:`, token.substring(0, 20) + '...');
+    } else {
+      console.log(`🚫 API Request to ${config.url} without token`);
     }
     return config;
   },
@@ -37,9 +40,16 @@ api.interceptors.response.use(
       error.message = 'Connection timeout. The server may be starting up, please try again in a moment.';
     } else if (error.response?.status === 401) {
       // Unauthorized - clear token and redirect to login
+      console.error('401 Unauthorized - token may be expired or invalid');
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
+      localStorage.removeItem('refreshToken');
       window.location.href = '/login';
+    } else if (error.response?.status === 403) {
+      // Forbidden - insufficient permissions
+      console.error('403 Forbidden - insufficient permissions:', error.response?.data);
+      console.error('Current token:', localStorage.getItem('authToken') ? 'Present' : 'Missing');
+      console.error('Current user:', localStorage.getItem('user'));
     } else if (error.response?.status === 0 || error.message.includes('CORS')) {
       console.error('CORS error - frontend domain not allowed by backend');
       error.message = 'Connection error. Please check your network connection.';

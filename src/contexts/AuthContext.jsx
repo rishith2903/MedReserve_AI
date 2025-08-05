@@ -86,6 +86,14 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('authToken', token);
         localStorage.setItem('user', JSON.stringify(user));
         localStorage.setItem('refreshToken', response.refreshToken);
+
+        // Debug logging
+        console.log('🔐 Login successful:', {
+          userId: user.id,
+          email: user.email,
+          role: user.role,
+          tokenLength: token.length
+        });
       } else {
         throw new Error('Invalid response format');
       }
