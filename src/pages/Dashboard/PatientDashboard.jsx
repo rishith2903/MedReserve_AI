@@ -29,52 +29,109 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { appointmentsAPI, doctorsAPI } from '../../services/api';
+import realTimeDataService from '../../services/realTimeDataService';
 
 const PatientDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [healthMetrics, setHealthMetrics] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
+    fetchDashboardData();
   }, []);
 
-  const healthMetrics = [
-    {
-      title: 'Upcoming Appointments',
-      value: '2',
-      icon: <Schedule />,
-      color: '#2196f3',
-      change: 'Next: Tomorrow 2:00 PM',
-      changeType: 'info'
-    },
-    {
-      title: 'Medical Reports',
-      value: '5',
-      icon: <Description />,
-      color: '#4caf50',
-      change: 'Last updated: 2 days ago',
-      changeType: 'positive'
-    },
-    {
-      title: 'Active Medications',
-      value: '3',
-      icon: <LocalHospital />,
-      color: '#ff9800',
-      change: '1 due for refill',
-      changeType: 'warning'
-    },
-    {
-      title: 'Health Score',
-      value: '85%',
-      icon: <TrendingUp />,
-      color: '#9c27b0',
-      change: '+5% from last month',
-      changeType: 'positive'
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log('🔄 Fetching dashboard metrics using real-time data service...');
+      const metrics = await realTimeDataService.getDashboardMetrics('patient');
+
+      // Set real-time metrics
+      setHealthMetrics([
+        {
+          title: 'Upcoming Appointments',
+          value: metrics.upcomingAppointments.toString(),
+          icon: <Schedule />,
+          color: '#2196f3',
+          change: metrics.upcomingAppointments > 0 ? `${metrics.upcomingAppointments} scheduled` : 'No upcoming appointments',
+          changeType: 'info'
+        },
+        {
+          title: 'Available Doctors',
+          value: metrics.availableDoctors.toString(),
+          icon: <Person />,
+          color: '#4caf50',
+          change: `${metrics.availableDoctors} of ${metrics.totalDoctors} available`,
+          changeType: 'positive'
+        },
+        {
+          title: 'Total Appointments',
+          value: metrics.totalAppointments.toString(),
+          icon: <Description />,
+          color: '#ff9800',
+          change: 'All time appointments',
+          changeType: 'positive'
+        },
+        {
+          title: 'Health Score',
+          value: '85%', // This would come from a health metrics API
+          icon: <TrendingUp />,
+          color: '#9c27b0',
+          change: '+5% from last month',
+          changeType: 'positive'
+        }
+      ]);
+
+      console.log('✅ Successfully loaded dashboard metrics');
+
+    } catch (error) {
+      console.error('❌ Error fetching dashboard data:', error);
+      setError('Failed to load dashboard data');
+
+      // Fallback to demo data
+      setHealthMetrics([
+        {
+          title: 'Upcoming Appointments',
+          value: '2',
+          icon: <Schedule />,
+          color: '#2196f3',
+          change: 'Next: Tomorrow 2:00 PM',
+          changeType: 'info'
+        },
+        {
+          title: 'Medical Reports',
+          value: '5',
+          icon: <Description />,
+          color: '#4caf50',
+          change: 'Last updated: 2 days ago',
+          changeType: 'positive'
+        },
+        {
+          title: 'Active Medications',
+          value: '3',
+          icon: <LocalHospital />,
+          color: '#ff9800',
+          change: '1 due for refill',
+          changeType: 'warning'
+        },
+        {
+          title: 'Health Score',
+          value: '85%',
+          icon: <TrendingUp />,
+          color: '#9c27b0',
+          change: '+5% from last month',
+          changeType: 'positive'
+        }
+      ]);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   const vitalsData = [
     { label: 'Heart Rate', value: '72 bpm', icon: <Favorite />, color: '#e91e63' },

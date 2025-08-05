@@ -36,6 +36,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useAuth } from '../../contexts/AuthContext';
 import { appointmentsAPI } from '../../services/api';
+import realTimeDataService from '../../services/realTimeDataService';
 
 const MyAppointments = () => {
   const { user } = useAuth();
@@ -99,30 +100,20 @@ const MyAppointments = () => {
   const fetchAppointments = async () => {
     setLoading(true);
     try {
-      // Call the API to get user's appointments
-      const response = await appointmentsAPI.getAll();
-      const appointmentsData = response.content || response.data || response;
+      setError(null);
 
-      // Transform backend data to match frontend format if needed
-      const transformedAppointments = Array.isArray(appointmentsData)
-        ? appointmentsData.map(apt => ({
-            id: apt.id,
-            doctorName: apt.doctorName || `Dr. ${apt.doctor?.firstName} ${apt.doctor?.lastName}`,
-            specialty: apt.doctor?.specialty || apt.specialty,
-            date: new Date(apt.appointmentDateTime).toDateString(),
-            time: new Date(apt.appointmentDateTime).toLocaleTimeString(),
-            status: apt.status,
-            type: apt.appointmentType || apt.type,
-            location: apt.location || 'MedReserve Clinic',
-            phone: apt.doctor?.phone || '+1 (555) 123-4567',
-            email: apt.doctor?.email || 'doctor@medreserve.com',
-            notes: apt.chiefComplaint || apt.notes
-          }))
-        : [];
+      console.log('🔄 Fetching appointments using real-time data service...');
+      const appointmentsData = await realTimeDataService.fetchAppointments();
 
-      setAppointments(transformedAppointments);
+      setAppointments(appointmentsData);
+      console.log('✅ Successfully loaded appointments:', appointmentsData.length);
+
+      if (appointmentsData.length <= 2) {
+        setError('Showing demo appointments. Book real appointments to see them here.');
+      }
+
     } catch (err) {
-      console.error('Error fetching appointments:', err);
+      console.error('❌ Error fetching appointments:', err);
       setError('Failed to load appointments. Using sample data.');
 
       // Fallback to mock data if API fails

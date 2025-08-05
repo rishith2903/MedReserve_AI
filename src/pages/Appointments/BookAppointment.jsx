@@ -45,7 +45,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useAuth } from '../../contexts/AuthContext';
-import { appointmentsAPI } from '../../services/api';
+import { appointmentsAPI, doctorsAPI } from '../../services/api';
 
 const BookAppointment = () => {
   const { doctorId } = useParams();
@@ -69,16 +69,46 @@ const BookAppointment = () => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
 
-  // Doctor info (mock data for now)
-  const doctor = {
-    id: doctorId,
-    name: 'Dr. Sarah Johnson',
-    specialty: 'Cardiology',
-    experience: 15,
-    rating: 4.8,
-    reviews: 156,
-    image: null,
-    consultationFee: 500,
+  const [doctor, setDoctor] = useState(null);
+  const [loadingDoctor, setLoadingDoctor] = useState(true);
+
+  useEffect(() => {
+    fetchDoctorDetails();
+  }, [doctorId]);
+
+  const fetchDoctorDetails = async () => {
+    try {
+      setLoadingDoctor(true);
+      const response = await doctorsAPI.getById(doctorId);
+
+      const doctorData = {
+        id: response.id,
+        name: `Dr. ${response.user?.firstName || response.firstName || 'Unknown'} ${response.user?.lastName || response.lastName || 'Doctor'}`,
+        specialty: response.specialty || 'General Medicine',
+        experience: response.yearsOfExperience || 0,
+        rating: response.averageRating || 4.5,
+        reviews: response.totalReviews || 0,
+        image: response.profileImage || null,
+        consultationFee: response.consultationFee || 100,
+      };
+
+      setDoctor(doctorData);
+    } catch (error) {
+      console.error('Error fetching doctor details:', error);
+      // Fallback to demo data
+      setDoctor({
+        id: doctorId,
+        name: 'Dr. Sarah Johnson',
+        specialty: 'Cardiology',
+        experience: 15,
+        rating: 4.8,
+        reviews: 156,
+        image: null,
+        consultationFee: 500,
+      });
+    } finally {
+      setLoadingDoctor(false);
+    }
   };
 
   const appointmentTypes = [

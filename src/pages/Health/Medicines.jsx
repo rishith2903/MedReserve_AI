@@ -37,6 +37,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { prescriptionsAPI } from '../../services/api';
+import realTimeDataService from '../../services/realTimeDataService';
 
 const Medicines = () => {
   const { user } = useAuth();
@@ -114,12 +115,21 @@ const Medicines = () => {
   const fetchMedicines = async () => {
     try {
       setLoading(true);
-      // For now, use mock data
-      // const response = await prescriptionsAPI.getAll();
-      // setMedicines(response.prescriptions || []);
-      setMedicines(mockMedicines);
+      setError(null);
+
+      console.log('🔄 Fetching prescriptions using real-time data service...');
+      const medicinesData = await realTimeDataService.fetchPrescriptions();
+
+      setMedicines(medicinesData);
+      console.log('✅ Successfully loaded prescriptions:', medicinesData.length);
+
+      if (medicinesData.length <= 2) {
+        setError('Showing demo prescriptions. Get prescriptions from doctors to see them here.');
+      }
+
     } catch (err) {
-      setError('Failed to fetch medicines');
+      console.error('❌ Error fetching medicines:', err);
+      setError('Failed to fetch medicines. Showing demo data.');
       setMedicines(mockMedicines); // Fallback to mock data
     } finally {
       setLoading(false);

@@ -1,12 +1,21 @@
 # 🏥 MedReserve AI - Frontend Application
 
-[![React](https://img.shields.io/badge/React-18.2.0-blue.svg)](https://reactjs.org/)
-[![Vite](https://img.shields.io/badge/Vite-5.0.0-purple.svg)](https://vitejs.dev/)
-[![Material-UI](https://img.shields.io/badge/Material--UI-5.14.0-blue.svg)](https://mui.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0.0-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19.1.0-blue.svg)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-5.4.0-purple.svg)](https://vitejs.dev/)
+[![Material-UI](https://img.shields.io/badge/Material--UI-7.2.0-blue.svg)](https://mui.com/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES2021-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A modern, responsive React frontend for the MedReserve AI healthcare management platform. Built with React 18, Vite, and Material-UI, providing an intuitive interface for patients, doctors, and administrators.
+A modern, responsive React frontend for the MedReserve AI healthcare management platform. Built with **JavaScript-only** architecture using React 19, Vite, and Material-UI, providing an intuitive interface for patients, doctors, and administrators.
+
+## 🚫 **IMPORTANT: JavaScript-Only Project**
+
+**This project uses ONLY JavaScript (.js/.jsx files). TypeScript is NOT allowed.**
+
+- ✅ **Use**: `.js` and `.jsx` files
+- ❌ **Do NOT use**: `.ts`, `.tsx`, `tsconfig.json`, or TypeScript syntax
+- 🛡️ **Enforcement**: Pre-commit hooks and linting rules prevent TypeScript usage
+- 📝 **Validation**: Run `npm run check-js-only` to verify compliance
 
 ## 🌟 Features
 

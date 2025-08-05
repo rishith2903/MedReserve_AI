@@ -33,6 +33,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { medicalReportsAPI } from '../../services/api';
+import realTimeDataService from '../../services/realTimeDataService';
 
 const MedicalReports = () => {
   const { user } = useAuth();
@@ -84,12 +85,21 @@ const MedicalReports = () => {
   const fetchReports = async () => {
     try {
       setLoading(true);
-      // For now, use mock data
-      // const response = await medicalReportsAPI.getAll();
-      // setReports(response.reports || []);
-      setReports(mockReports);
+      setError(null);
+
+      console.log('🔄 Fetching medical reports using real-time data service...');
+      const reportsData = await realTimeDataService.fetchMedicalReports();
+
+      setReports(reportsData);
+      console.log('✅ Successfully loaded medical reports:', reportsData.length);
+
+      if (reportsData.length <= 2) {
+        setError('Showing demo medical reports. Upload reports to see them here.');
+      }
+
     } catch (err) {
-      setError('Failed to fetch medical reports');
+      console.error('❌ Error fetching medical reports:', err);
+      setError('Failed to fetch medical reports. Showing demo data.');
       setReports(mockReports); // Fallback to mock data
     } finally {
       setLoading(false);

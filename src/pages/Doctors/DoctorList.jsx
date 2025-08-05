@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -15,6 +15,9 @@ import {
   Select,
   MenuItem,
   Rating,
+  Skeleton,
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import {
   Search,
@@ -23,93 +26,120 @@ import {
   CalendarToday,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { departments } from '../../data/departments';
+import { doctorsAPI } from '../../services/api';
+import RealTimeBooking from '../../components/RealTimeBooking';
+import realTimeDataService from '../../services/realTimeDataService';
 
 const DoctorList = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [doctors, setDoctors] = useState([]);
+  const [specialties, setSpecialties] = useState(['All']);
+  const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
-  // Mock doctors data
-  const doctors = [
-    {
-      id: 1,
-      name: 'Dr. Rajesh Kumar',
-      specialty: 'Cardiology',
-      experience: 15,
-      rating: 4.8,
-      reviews: 124,
-      location: 'Building A, Floor 3',
-      availability: 'Available Today',
-      image: null,
-    },
-    {
-      id: 2,
-      name: 'Dr. Priya Sharma',
-      specialty: 'Cardiology',
-      experience: 12,
-      rating: 4.9,
-      reviews: 98,
-      location: 'Building A, Floor 3',
-      availability: 'Available Tomorrow',
-      image: null,
-    },
-    {
-      id: 3,
-      name: 'Dr. Robert Miller',
-      specialty: 'Neurology',
-      experience: 18,
-      rating: 4.7,
-      reviews: 156,
-      location: 'Building B, Floor 2',
-      availability: 'Available Today',
-      image: null,
-    },
-    {
-      id: 4,
-      name: 'Dr. Lisa Anderson',
-      specialty: 'Dermatology',
-      experience: 10,
-      rating: 4.6,
-      reviews: 89,
-      location: 'Building C, Floor 1',
-      availability: 'Available Today',
-      image: null,
-    },
-    {
-      id: 5,
-      name: 'Dr. James Taylor',
-      specialty: 'Orthopedics',
-      experience: 14,
-      rating: 4.8,
-      reviews: 112,
-      location: 'Building A, Floor 2',
-      availability: 'Available Tomorrow',
-      image: null,
-    },
-  ];
+  useEffect(() => {
+    fetchDoctors();
+    fetchSpecialties();
+
+    // Auto-refresh every 60 seconds
+    const interval = setInterval(() => {
+      if (!loading && !isRefreshing) {
+        handleRefresh();
+      }
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([fetchDoctors(), fetchSpecialties()]);
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error('Refresh failed:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const fetchDoctors = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log('🔄 Fetching doctors using real-time data service...');
+      const doctorsData = await realTimeDataService.fetchDoctors();
+
+      setDoctors(doctorsData);
+      setLastUpdated(new Date());
+      console.log('✅ Successfully loaded doctors:', doctorsData.length);
+
+      if (doctorsData.length > 50) {
+        setError('Showing enhanced doctor database with real-time availability updates.');
+      }
+
+    } catch (error) {
+      console.error('❌ Error fetching doctors:', error);
+      setError('Failed to load doctors. Please try again.');
+
+      // This shouldn't happen as the service has built-in fallbacks
+      setDoctors([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSpecialties = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/doctors/specialties`);
+      if (response.ok) {
+        const specialtiesData = await response.json();
+        setSpecialties(['All', ...specialtiesData]);
+      }
+    } catch (error) {
+      console.error('Error fetching specialties:', error);
+      // Fallback specialties
+      setSpecialties(['All', 'Cardiology', 'Dermatology', 'Neurology', 'Orthopedics', 'Pediatrics', 'Psychiatry']);
+    }
+  };
 
   const filteredDoctors = doctors.filter(doctor => {
     const matchesSearch = doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          doctor.specialty.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSpecialty = !selectedSpecialty || doctor.specialty === selectedSpecialty;
+    const matchesSpecialty = selectedSpecialty === '' || selectedSpecialty === 'All' ||
+                            doctor.specialty === selectedSpecialty;
     return matchesSearch && matchesSpecialty;
   });
 
-  const specialties = [...new Set(doctors.map(doctor => doctor.specialty))];
-
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
-        Find a Doctor
+        Find Doctors
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
         Browse our qualified healthcare professionals
       </Typography>
 
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
+
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+          <CircularProgress />
+        </Box>
+      )}
+
       {/* Search and Filter */}
-      <Grid container spacing={2} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={8}>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={6}>
           <TextField
             fullWidth
             placeholder="Search doctors by name or specialty..."
@@ -122,26 +152,74 @@ const DoctorList = () => {
                 </InputAdornment>
               ),
             }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                backgroundColor: 'background.paper'
+              }
+            }}
           />
         </Grid>
         <Grid item xs={12} md={4}>
           <FormControl fullWidth>
-            <InputLabel>Specialty</InputLabel>
+            <InputLabel>Filter by Specialty</InputLabel>
             <Select
               value={selectedSpecialty}
-              label="Specialty"
+              label="Filter by Specialty"
               onChange={(e) => setSelectedSpecialty(e.target.value)}
+              sx={{
+                borderRadius: 2,
+                backgroundColor: 'background.paper'
+              }}
             >
-              <MenuItem value="">All Specialties</MenuItem>
               {specialties.map((specialty) => (
-                <MenuItem key={specialty} value={specialty}>
+                <MenuItem key={specialty} value={specialty === 'All' ? '' : specialty}>
                   {specialty}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
         </Grid>
+        <Grid item xs={12} md={2}>
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={handleRefresh}
+            disabled={loading || isRefreshing}
+            sx={{
+              height: '56px',
+              borderRadius: 2,
+              borderColor: 'primary.main',
+              '&:hover': {
+                borderColor: 'primary.dark',
+                backgroundColor: 'primary.50'
+              }
+            }}
+          >
+            {(loading || isRefreshing) ? <CircularProgress size={24} /> : 'Refresh'}
+          </Button>
+        </Grid>
       </Grid>
+
+      {/* Results Summary */}
+      {!loading && (
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="body1" color="text.secondary">
+            {filteredDoctors.length === 0
+              ? 'No doctors found matching your criteria'
+              : `Showing ${filteredDoctors.length} doctor${filteredDoctors.length !== 1 ? 's' : ''}`
+            }
+            {selectedSpecialty && ` in ${selectedSpecialty}`}
+            {searchTerm && ` matching "${searchTerm}"`}
+          </Typography>
+          {lastUpdated && (
+            <Typography variant="caption" color="text.secondary">
+              Last updated: {lastUpdated.toLocaleTimeString()}
+              {isRefreshing && ' (refreshing...)'}
+            </Typography>
+          )}
+        </Box>
+      )}
 
       {/* Doctors Grid */}
       <Grid container spacing={3}>
@@ -186,7 +264,11 @@ const DoctorList = () => {
                   </Box>
                   
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    {doctor.experience} years experience
+                    {typeof doctor.experience === 'number' ? `${doctor.experience} years` : doctor.experience} experience
+                  </Typography>
+
+                  <Typography variant="body2" color="primary" sx={{ mb: 1, fontWeight: 600 }}>
+                    ${doctor.consultationFee} consultation fee
                   </Typography>
                   
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>

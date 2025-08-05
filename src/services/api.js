@@ -160,10 +160,7 @@ export const appointmentsAPI = {
     return response.data;
   },
 
-  cancel: async (id) => {
-    const response = await api.put(`/appointments/${id}/cancel`);
-    return response.data;
-  }
+  // Removed duplicate cancel method - using the one with reason parameter above
 };
 
 // Medical Reports API
@@ -308,6 +305,24 @@ export const healthAPI = {
 
   test: async () => {
     const response = await api.get('/test');
+    return response.data;
+  }
+};
+
+// Health Tips API
+export const healthTipsAPI = {
+  getAll: async () => {
+    const response = await api.get('/health-tips');
+    return response.data;
+  },
+
+  getByCategory: async (category) => {
+    const response = await api.get(`/health-tips/category/${category}`);
+    return response.data;
+  },
+
+  getById: async (id) => {
+    const response = await api.get(`/health-tips/${id}`);
     return response.data;
   }
 };
