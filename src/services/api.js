@@ -148,6 +148,11 @@ export const appointmentsAPI = {
       params: { date }
     });
     return response.data;
+  },
+
+  cancel: async (id) => {
+    const response = await api.put(`/appointments/${id}/cancel`);
+    return response.data;
   }
 };
 
