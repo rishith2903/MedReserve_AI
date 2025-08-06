@@ -50,48 +50,54 @@ const MyAppointments = () => {
   const [cancelDialog, setCancelDialog] = useState(false);
   const [newDateTime, setNewDateTime] = useState(null);
 
-  // Mock data for demonstration
-  const mockAppointments = [
-    {
-      id: 1,
-      doctorName: 'Dr. Sarah Johnson',
-      specialty: 'Cardiology',
-      date: '2025-07-28',
-      time: '10:00 AM',
-      status: 'CONFIRMED',
-      type: 'CONSULTATION',
-      location: 'Room 201, Cardiology Wing',
-      phone: '+1 (555) 123-4567',
-      email: 'sarah.johnson@medreserve.com',
-      notes: 'Regular checkup for heart condition'
-    },
-    {
-      id: 2,
-      doctorName: 'Dr. Michael Chen',
-      specialty: 'Dermatology',
-      date: '2025-07-30',
-      time: '2:30 PM',
-      status: 'PENDING',
-      type: 'FOLLOW_UP',
-      location: 'Room 105, Dermatology Clinic',
-      phone: '+1 (555) 987-6543',
-      email: 'michael.chen@medreserve.com',
-      notes: 'Follow-up for skin treatment'
-    },
-    {
-      id: 3,
-      doctorName: 'Dr. Emily Rodriguez',
-      specialty: 'Neurology',
-      date: '2025-07-25',
-      time: '9:15 AM',
-      status: 'COMPLETED',
-      type: 'CONSULTATION',
-      location: 'Room 301, Neurology Department',
-      phone: '+1 (555) 456-7890',
-      email: 'emily.rodriguez@medreserve.com',
-      notes: 'Consultation for headaches'
-    }
-  ];
+  // Enhanced fallback appointments data (used only when API fails)
+  const getFallbackAppointments = () => {
+    const today = new Date();
+    const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+    const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    return [
+      {
+        id: 1,
+        doctorName: 'Dr. Sarah Johnson',
+        specialty: 'Cardiology',
+        date: tomorrow.toLocaleDateString(),
+        time: '10:00 AM',
+        status: 'CONFIRMED',
+        type: 'CONSULTATION',
+        location: 'MedReserve Medical Center - Cardiology Wing',
+        phone: '+1 (555) 123-4567',
+        email: 'sarah.johnson@medreserve.com',
+        notes: 'Regular cardiac checkup and consultation'
+      },
+      {
+        id: 2,
+        doctorName: 'Dr. Michael Chen',
+        specialty: 'Dermatology',
+        date: nextWeek.toLocaleDateString(),
+        time: '2:30 PM',
+        status: 'PENDING',
+        type: 'FOLLOW_UP',
+        location: 'MedReserve Medical Center - Dermatology Clinic',
+        phone: '+1 (555) 987-6543',
+        email: 'michael.chen@medreserve.com',
+        notes: 'Follow-up appointment for skin condition treatment'
+      },
+      {
+        id: 3,
+        doctorName: 'Dr. Emily Rodriguez',
+        specialty: 'Neurology',
+        date: new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        time: '9:15 AM',
+        status: 'COMPLETED',
+        type: 'CONSULTATION',
+        location: 'MedReserve Medical Center - Neurology Department',
+        phone: '+1 (555) 456-7890',
+        email: 'emily.rodriguez@medreserve.com',
+        notes: 'Neurological consultation for recurring headaches'
+      }
+    ];
+  };
 
   useEffect(() => {
     fetchAppointments();
@@ -114,10 +120,10 @@ const MyAppointments = () => {
 
     } catch (err) {
       console.error('❌ Error fetching appointments:', err);
-      setError('Failed to load appointments. Using sample data.');
+      setError('Failed to load appointments from server. Showing sample data for demonstration.');
 
-      // Fallback to mock data if API fails
-      setAppointments(mockAppointments);
+      // Fallback to enhanced demo data if API fails
+      setAppointments(getFallbackAppointments());
     } finally {
       setLoading(false);
     }

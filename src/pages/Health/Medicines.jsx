@@ -48,65 +48,71 @@ const Medicines = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
 
-  // Mock data for demonstration
-  const mockMedicines = [
-    {
-      id: 1,
-      name: 'Lisinopril',
-      dosage: '10mg',
-      frequency: 'Once daily',
-      prescribedBy: 'Dr. Smith',
-      startDate: '2024-01-01',
-      endDate: '2024-03-01',
-      status: 'Active',
-      instructions: 'Take with food in the morning',
-      remainingDays: 45,
-      totalDays: 60,
-      category: 'Blood Pressure',
-    },
-    {
-      id: 2,
-      name: 'Metformin',
-      dosage: '500mg',
-      frequency: 'Twice daily',
-      prescribedBy: 'Dr. Johnson',
-      startDate: '2023-12-15',
-      endDate: '2024-06-15',
-      status: 'Active',
-      instructions: 'Take with meals',
-      remainingDays: 120,
-      totalDays: 180,
-      category: 'Diabetes',
-    },
-    {
-      id: 3,
-      name: 'Amoxicillin',
-      dosage: '250mg',
-      frequency: 'Three times daily',
-      prescribedBy: 'Dr. Williams',
-      startDate: '2024-01-10',
-      endDate: '2024-01-20',
-      status: 'Completed',
-      instructions: 'Complete full course',
-      remainingDays: 0,
-      totalDays: 10,
-      category: 'Antibiotic',
-    },
-    {
-      id: 4,
-      name: 'Vitamin D3',
-      dosage: '1000 IU',
-      frequency: 'Once daily',
-      prescribedBy: 'Dr. Brown',
-      startDate: '2024-01-01',
-      endDate: '2024-12-31',
-      status: 'Active',
-      instructions: 'Take with fatty meal',
-      remainingDays: 300,
-      totalDays: 365,
-      category: 'Supplement',
-    },
-  ];
+  // Enhanced fallback medicines data (used only when API fails)
+  const getFallbackMedicines = () => {
+    const today = new Date();
+    const startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 days ago
+    const endDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+
+    return [
+      {
+        id: 1,
+        name: 'Lisinopril',
+        dosage: '10mg',
+        frequency: 'Once daily',
+        prescribedBy: 'Dr. Sarah Johnson',
+        startDate: startDate.toLocaleDateString(),
+        endDate: endDate.toLocaleDateString(),
+        status: 'Active',
+        instructions: 'Take with food in the morning to reduce stomach irritation',
+        remainingDays: 30,
+        totalDays: 60,
+        category: 'Cardiovascular',
+      },
+      {
+        id: 2,
+        name: 'Metformin',
+        dosage: '500mg',
+        frequency: 'Twice daily',
+        prescribedBy: 'Dr. Michael Chen',
+        startDate: new Date(today.getTime() - 45 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        endDate: new Date(today.getTime() + 45 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        status: 'Active',
+        instructions: 'Take with meals to minimize gastrointestinal side effects',
+        remainingDays: 45,
+        totalDays: 90,
+        category: 'Diabetes',
+      },
+      {
+        id: 3,
+        name: 'Amoxicillin',
+        dosage: '250mg',
+        frequency: 'Three times daily',
+        prescribedBy: 'Dr. Emily Rodriguez',
+        startDate: new Date(today.getTime() - 20 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        endDate: new Date(today.getTime() - 10 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        status: 'Completed',
+        instructions: 'Complete full course even if symptoms improve',
+        remainingDays: 0,
+        totalDays: 10,
+        category: 'Antibiotic',
+      },
+      {
+        id: 4,
+        name: 'Vitamin D3',
+        dosage: '1000 IU',
+        frequency: 'Once daily',
+        prescribedBy: 'Dr. James Wilson',
+        startDate: new Date(today.getTime() - 60 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        endDate: new Date(today.getTime() + 305 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        status: 'Active',
+        instructions: 'Take with a fatty meal for better absorption',
+        remainingDays: 305,
+        totalDays: 365,
+        category: 'Supplement',
+      },
+    ];
+  };
 
   useEffect(() => {
     fetchMedicines();
@@ -129,8 +135,8 @@ const Medicines = () => {
 
     } catch (err) {
       console.error('❌ Error fetching medicines:', err);
-      setError('Failed to fetch medicines. Showing demo data.');
-      setMedicines(mockMedicines); // Fallback to mock data
+      setError('Failed to load medicines from server. Showing sample data for demonstration.');
+      setMedicines(getFallbackMedicines()); // Fallback to enhanced demo data
     } finally {
       setLoading(false);
     }
