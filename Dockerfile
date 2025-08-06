@@ -19,8 +19,8 @@ RUN npm run build
 # Production stage with Nginx
 FROM nginx:alpine
 
-# Copy built application
-COPY --from=build /app/build /usr/share/nginx/html
+# Copy built application (Vite builds to dist directory)
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
